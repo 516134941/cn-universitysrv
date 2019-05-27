@@ -1,0 +1,10 @@
+listen = ":8010"
+
+[dbservers]
+    [dbservers.universitydb]
+    host = "127.0.0.1"
+    port = 5431
+    dbname = "test"
+    user = "hcf"
+    password = "123456"
+    statement_timeout = 500 # 语句执行超时时间，毫秒
