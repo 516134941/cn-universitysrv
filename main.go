@@ -5,7 +5,6 @@ import (
 	"cn-universitysrv/handles"
 	"cn-universitysrv/middlewares"
 	"flag"
-	"qipai/handlers"
 	"runtime"
 	"time"
 
@@ -44,7 +43,7 @@ func main() {
 	}))
 	router.Use(middlewares.Config(tomlConfig))
 	router.Use(middlewares.Gorm("universitydb", tomlConfig))
-	router.GET("/", handlers.Index)                        // 首页
+	router.GET("/", handles.Index)                         // 首页
 	router.POST("/store/schools", handles.StoreUniversity) // 存储大学信息
 	router.GET("/schools", handles.GetUniversityList)      // 获取大学列表
 	router.GET("/provinces", handles.GetProvinceList)      // 省份列表
