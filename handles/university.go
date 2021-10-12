@@ -4,7 +4,7 @@ import (
 	"cn-universitysrv/config"
 	"cn-universitysrv/models"
 	"cn-universitysrv/utils"
-	"go-common/library/log"
+	"github.com/go-xweb/log"
 	"net/http"
 	"time"
 
@@ -21,15 +21,14 @@ func Index(ctx *gin.Context) {
 func StoreUniversity(c *gin.Context) {
 	defer utils.LogStat("StoreUniversity", c.Request, time.Now())
 
-	db := c.MustGet("universitydb").(*gorm.DB)
-	un := []models.UniversityJSON{}
+	var un []models.UniversityJSON
 	config.LoadJSON("docs/ChinaUniversityList.json", &un)
 	for _, v := range un {
 		province := v.Province
 		for _, sh := range v.Schools {
 			city := sh.City
 			name := sh.Name
-			if err := models.StoreSchool(db, province, city, name); err != nil {
+			if err := models.StoreSchool(province, city, name); err != nil {
 				log.Error("StoreUniversity err:%v\n", err)
 				c.JSON(http.StatusOK, gin.H{"errno": "40", "errmsg": "存储出错"})
 				return
@@ -56,9 +55,8 @@ func GetUniversityList(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"errno": "-1", "errmsg": "参数不匹配，请重试"})
 		return
 	}
-	db := c.MustGet("universitydb").(*gorm.DB)
 	// 获取列表
-	list, err := models.GetUniversityList(db, req.Province, req.City)
+	list, err := models.GetUniversityList(req.Province, req.City)
 	if err != nil && err != gorm.ErrRecordNotFound {
 		log.Error("GetUniversityList err:%v\n", err)
 		c.JSON(http.StatusOK, gin.H{"errno": "41", "errmsg": "获取列表失败"})
@@ -71,9 +69,8 @@ func GetUniversityList(c *gin.Context) {
 func GetProvinceList(c *gin.Context) {
 	defer utils.LogStat("GetProvinceList", c.Request, time.Now())
 
-	db := c.MustGet("universitydb").(*gorm.DB)
 	// 获取列表
-	list, err := models.GetProvinceList(db)
+	list, err := models.GetProvinceList()
 	if err != nil && err != gorm.ErrRecordNotFound {
 		log.Error("GetUniversityList err:%v\n", err)
 		c.JSON(http.StatusOK, gin.H{"errno": "41", "errmsg": "获取列表失败"})
@@ -97,9 +94,8 @@ func GetCityList(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"errno": "-1", "errmsg": "参数不匹配，请重试"})
 		return
 	}
-	db := c.MustGet("universitydb").(*gorm.DB)
 	// 获取列表
-	list, err := models.GetCityList(db, req.Province)
+	list, err := models.GetCityList(req.Province)
 	if err != nil && err != gorm.ErrRecordNotFound {
 		log.Error("GetCityList err:%v\n", err)
 		c.JSON(http.StatusOK, gin.H{"errno": "41", "errmsg": "获取列表失败"})

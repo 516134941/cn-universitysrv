@@ -42,12 +42,13 @@ func main() {
 		MaxAge:           12 * time.Hour,
 	}))
 	router.Use(middlewares.Config(tomlConfig))
-	router.Use(middlewares.Gorm("universitydb", tomlConfig))
+	middlewares.PgConnect("universitydb", tomlConfig)
+
 	router.GET("/", handles.Index)                         // 首页
 	router.POST("/store/schools", handles.StoreUniversity) // 存储大学信息
 	router.GET("/schools", handles.GetUniversityList)      // 获取大学列表
 	router.GET("/provinces", handles.GetProvinceList)      // 省份列表
-	router.GET("/citys", handles.GetCityList)              // 获取城市列表
+	router.GET("/citys", handles.GetCityList)              // 获取城市列表 路由命名错误,不做修改
 	// 启动服务
 	log.Debugf("run cn-universitysrv at %v\n", tomlConfig.GetListenAddr())
 	router.Run(tomlConfig.GetListenAddr())

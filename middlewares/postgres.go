@@ -4,32 +4,14 @@ import (
 	"cn-universitysrv/config"
 	"fmt"
 
-	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
-	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
-// Postgres sqlx连接
-func Postgres(dbName string, tomlConfig *config.Config) gin.HandlerFunc {
-	// 读取配置
-	dbConfig, ok := tomlConfig.DBServerConf(dbName)
-	if !ok {
-		panic(fmt.Sprintf("Postgres: %v no set.", dbName))
-	}
-	// 链接数据库
-	db, err := sqlx.Open("postgres", dbConfig.ConnectString())
-	if err != nil {
-		panic(fmt.Sprintf("sqlx.Open: err:%v", err))
-	}
-	return func(c *gin.Context) {
-		c.Set(dbName, db)
-		c.Next()
-	}
-}
+var Db *gorm.DB
 
-// Gorm Gorm
-func Gorm(dbName string, tomlConfig *config.Config) gin.HandlerFunc {
+// PgConnect 数据库连接
+func PgConnect(dbName string, tomlConfig *config.Config){
 	// 读取配置
 	dbConfig, ok := tomlConfig.DBServerConf(dbName)
 	if !ok {
@@ -45,8 +27,5 @@ func Gorm(dbName string, tomlConfig *config.Config) gin.HandlerFunc {
 	db.DB().SetMaxOpenConns(10)
 	db.LogMode(true)
 
-	return func(c *gin.Context) {
-		c.Set(dbName, db)
-		c.Next()
-	}
+	Db = db
 }

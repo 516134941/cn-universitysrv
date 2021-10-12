@@ -1,6 +1,8 @@
 package models
 
-import "github.com/jinzhu/gorm"
+import (
+	"cn-universitysrv/middlewares"
+)
 
 // UniversityJSON json数据
 type UniversityJSON struct {
@@ -15,9 +17,9 @@ type SchoolStruct struct {
 }
 
 // StoreSchool 存储学校列表
-func StoreSchool(db *gorm.DB, province, city, name string) (err error) {
+func StoreSchool(province, city, name string) (err error) {
 	tpl := "insert into university(province,city,name)values(?,?,?)"
-	if err = db.Exec(tpl, province, city, name).Error; err != nil {
+	if err = middlewares.Db.Exec(tpl, province, city, name).Error; err != nil {
 		return
 	}
 	return
@@ -32,8 +34,8 @@ type University struct {
 }
 
 // GetUniversityList 获取大学列表
-func GetUniversityList(db *gorm.DB, province, city string) (res []University, err error) {
-	db = db.Table("university")
+func GetUniversityList( province, city string) (res []University, err error) {
+	db := middlewares.Db.Table("university")
 	// 条件查询
 	if province != "" {
 		db = db.Where("province=?", province)
@@ -46,13 +48,13 @@ func GetUniversityList(db *gorm.DB, province, city string) (res []University, er
 }
 
 // GetProvinceList 获取省份列表
-func GetProvinceList(db *gorm.DB) (res []string, err error) {
-	err = db.Table("university").Pluck("distinct(province)", &res).Error
+func GetProvinceList() (res []string, err error) {
+	err = middlewares.Db.Table("university").Pluck("distinct(province)", &res).Error
 	return
 }
 
 // GetCityList 获取城市列表
-func GetCityList(db *gorm.DB, province string) (res []string, err error) {
-	err = db.Table("university").Where("province=?", province).Pluck("distinct(city)", &res).Error
+func GetCityList( province string) (res []string, err error) {
+	err = middlewares.Db.Table("university").Where("province=?", province).Pluck("distinct(city)", &res).Error
 	return
 }
